@@ -79,8 +79,8 @@ function update_scene1(){
     .append("g")
       .attr("transform",
             "translate(" + margin.left + "," + margin.top + ")");
-  d3.csv("https://flunky.github.io/cars2017.csv", function(data) {
-
+  d3.csv("cars2017.csv", function(data) {
+// https://flunky.github.io/cars2017.csv
     var tooltip_1 = d3.select("#scene1")
     .append("div")
     .style("opacity", 0)
