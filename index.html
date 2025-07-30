@@ -1,5 +1,6 @@
 <meta charset="utf-8">
 <script src="https://d3js.org/d3.v4.js"></script>
+<script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.min.js"></script>
 <html>
     <head>
         <style>
@@ -12,12 +13,26 @@
               justify-content: center;
               align-items: center;
             }
+            button {
+              display:block;
+              margin:0 auto;
+            }
             /* .selected {
               opacity: 1 !important;
               stroke: black;
               stroke-width: 1px;
               fill:'#00ffff'
             } */
+            #annotation1 {
+              position:absolute;
+              top:200px;
+              left:1200px;
+            }
+            #annotation2 {
+              position:absolute;
+              top:600px;
+              left:1000px;
+            }
         </style>
         <title>Martini Glass Narraive Visualization for sales performance report</title>
     </head>
@@ -25,9 +40,12 @@
 
         <div><h1>scene 1 scatter plot of city mpg and highway mpg for each model</h1></div>
         <div id="scene1"></div>
+        <div id="annotation1">------car with better performance</div>
+        <div id="annotation2">------car with worse performance</div>
 
-        <div><h1>scene 2 ranking of city mpg and highway mpg within each power</h1></div>
-        <p>please select one fuel: </p>
+        <div><h1>scene 2 ranking of city mpg</h1></div>
+        <button onclick="open_scene_2()">go to second scene</button>
+        <!-- <p>please select one fuel: </p>
           <input type="radio"  name="fuel" value="Gasoline" checked="True">
           <label >Gasoline</label><br>
           <input type="radio"  name="fuel" value="Electricity">
@@ -42,14 +60,15 @@
           <input type="radio"  name="cylinder" value="6" checked="True">
           <label >6</label><br>
           <input type="radio"  name="cylinder" value="8">
-          <label >8</label><br>
+          <label >8</label><br> -->
         <!-- <label>enter fuel: </label><input id="fuel"><br><br>
         <label>enter number of cylinder: </label><input id="number_cylinder"><br><br> -->
-        <button onclick="update_scene2(get_selected('fuel'),get_selected('cylinder'))">find</button>
-        <div id="scene2"></div>
+        <!-- <button onclick="update_scene2(get_selected('fuel'),get_selected('cylinder'))">find</button>
+        <div id="scene2"></div> -->
 
         <div><h1>scene 3 proportion of each power of each maker</h1></div>
-        <div id="scene3"></div>
+        <button onclick="open_scene_3()">go to third scene</button>
+        <!-- <div id="scene3"></div>
           <p>please select maker:</p>
           <input type="radio"  name="maker" value="All" checked="True">
           <label >All</label><br>
@@ -59,15 +78,17 @@
           <label >BMW</label><br>
           <input type="radio"  name="maker" value="Hyundai">
           <label >Hyundai</label><br>
-        <br>
-        <button onclick="update_scene3(get_selected('maker'))">find</button>
+        <br> -->
+        <!-- <button onclick="update_scene3(get_selected('maker'))">find</button> -->
+        <div><h1>scene 2 ranking of highway mpg</h1></div>
+        <button onclick="open_scene_4()">go to fourth scene</button>
     </body>
 </html>
 <script>
 
 //scene1
 function update_scene1(){
-  var margin = {top: 10, right: 30, bottom: 30, left: 60},
+  var margin = {top: 10, right: 30, bottom: 40, left: 60},
     width = 800 - margin.left - margin.right,
     height = 800 - margin.top - margin.bottom;
 
@@ -79,8 +100,7 @@ function update_scene1(){
     .append("g")
       .attr("transform",
             "translate(" + margin.left + "," + margin.top + ")");
-  d3.csv("cars2017.csv", function(data) {
-// https://flunky.github.io/cars2017.csv
+ d3.csv("https://flunky.github.io/cars2017.csv", function(data) {
     var tooltip_1 = d3.select("#scene1")
     .append("div")
     .style("opacity", 0)
@@ -103,7 +123,7 @@ function update_scene1(){
       )
       .style("left", (d3.mouse(this)[0])  + 400 + "px") // It is important to put the +90: other wise the tooltip is exactly where the point is an it creates a weird effect
       .style("top", + (d3.mouse(this)[1]) -50 +  "px");
-    console.log(d3.mouse(this));
+    // console.log(d3.mouse(this));
   }
 
   // A function that change this tooltip when the leaves a point: just need to set opacity to 0 again
@@ -129,6 +149,21 @@ function update_scene1(){
   //   .range([ height, 0]);
   svg.append("g")
     .call(d3.axisLeft(y).tickValues([10,20,50,100]).tickFormat(d3.format(".0f")));
+
+  // Add X axis label:
+  svg.append("text")
+    .attr("text-anchor", "end")
+    .attr("x", width)
+    .attr("y", height + margin.top+20)
+    .text("average highway mpg");
+
+  // Y axis label:
+  svg.append("text")
+    .attr("text-anchor", "end")
+    .attr("transform", "rotate(-90)")
+    .attr("y", -margin.left+20)
+    .attr("x", -margin.top)
+    .text("average city mpg")
 
   // Add dots
   var dot = svg.append('g')
@@ -165,9 +200,28 @@ function update_scene1(){
   //          y1 = brush_coords[1][1];
   //     return x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1;    // This return TRUE or FALSE depending on if the points is in the selected area
   // }
+  // Features of the annotation
+  // const annotations = [
+  //   {
+  //     note: {
+  //       label: "Here is the annotation label",
+  //       title: "Annotation title"
+  //     },
+  //     x: 0,
+  //     y: 0,
+  //     dy: 100,
+  //     dx: 100
+  //   }
+  // ]
 
+  // // Add annotation to the chart
+  // const makeAnnotations = d3.annotation()
+  //   .annotations(annotations)
+  // // d3.select("#scene1")
+  // //   .append("g")
+  //   svg.call(makeAnnotations)
 
-})
+  })
 }
 
 update_scene1()
@@ -208,7 +262,7 @@ function update_scene2(fuel,number_cylinder) {
     .append("g")
       .attr("transform",
             "translate(" + margin.left + "," + margin.top + ")");
-  d3.csv("cars2017.csv", function(data) {
+  d3.csv("https://flunky.github.io/cars2017.csv", function(data) {
     var filtered_data=data.filter(function(d){return (d.Fuel==fuel && d.EngineCylinders==number_cylinder)})
     // console.log(filtered_data)
     if (filtered_data.length==0){
@@ -284,7 +338,7 @@ function update_scene2(fuel,number_cylinder) {
   })
 
 }
-update_scene2('Gasoline','6')
+// update_scene2('Gasoline','6')
 
 
 
@@ -325,7 +379,7 @@ function update_scene3(maker){
       .attr("height", height)
     .append("g")
       .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-  d3.csv("cars2017.csv", function(data) {
+  d3.csv("https://flunky.github.io/cars2017.csv", function(data) {
     var filtered_data={}
     if (maker=='All'){
       filtered_data=data
@@ -388,6 +442,18 @@ function get_selected(name){
   return null
 }
 
-update_scene3('All')
+// update_scene3('All')
+
+function open_scene_2(){
+  window.open('scene2.html')
+}
+
+function open_scene_3(){
+  window.open('scene3.html')
+}
+
+function open_scene_4(){
+  window.open('scene4.html')
+}
 
 </script>

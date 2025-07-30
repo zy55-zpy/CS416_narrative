@@ -1,0 +1,151 @@
+<meta charset="utf-8">
+<script src="https://d3js.org/d3.v4.js"></script>
+<html>
+    <head>
+        <style>
+            h1 {
+                text-align: center;
+            }
+            #scene1,#scene2,#scene3 {
+              /* margin-left: 300px; */
+              display:flex;
+              justify-content: center;
+              align-items: center;
+            }
+            /* .selected {
+              opacity: 1 !important;
+              stroke: black;
+              stroke-width: 1px;
+              fill:'#00ffff'
+            } */
+        </style>
+        <title>Narraive Visualization scene 3</title>
+    </head>
+    <body>
+
+        <div><h1>scene 3 proportion of each power of each maker</h1></div>
+        <div id="scene3"></div>
+          <p>please select maker:</p>
+          <input type="radio"  name="maker" value="All" checked="True">
+          <label >All</label><br>
+          <input type="radio"  name="maker" value="Mitsubishi">
+          <label >Mitsubishi</label><br>
+          <input type="radio"  name="maker" value="BMW">
+          <label >BMW</label><br>
+          <input type="radio"  name="maker" value="Hyundai">
+          <label >Hyundai</label><br>
+        <br>
+        <button onclick="update_scene3(get_selected('maker'))">find</button>
+    </body>
+</html>
+<script>
+
+
+
+
+
+// scene3
+// set the dimensions and margins of the graph
+var width = 450
+    height = 450
+    margin = 40
+
+// The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
+var radius = Math.min(width, height) / 2 - margin
+
+// append the svg object
+var svg = d3.select("#scene3")
+  .append("svg")
+    .attr("width", width)
+    .attr("height", height)
+  .append("g")
+    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+function update_scene3(maker){
+  if (maker==null){
+    alert('please select a power')
+    return
+  }
+  d3.select('#scene3').html('')
+  var width = 600
+    height = 600
+    margin = 40
+
+  // The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
+  var radius = Math.min(width, height) / 2 - margin
+
+  // append the svg object
+  var svg = d3.select("#scene3")
+    .append("svg")
+      .attr("width", width)
+      .attr("height", height)
+    .append("g")
+      .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+  d3.csv("https://flunky.github.io/cars2017.csv", function(data) {
+    var filtered_data={}
+    if (maker=='All'){
+      filtered_data=data
+    }
+    else {
+      filtered_data=data.filter(function(d){return (d.Make==maker)})
+    }
+    var dict={'Gasoline':0,'Electricity':0,'Diesel':0};
+    for (var obj of filtered_data) {
+      dict[obj.Fuel]+=1
+    }
+    // console.log(dict);
+    // set the color scale
+    var color = d3.scaleOrdinal()
+      .domain(dict)
+      .range(["#0000ff", "#ff0000", "#ffff00"])
+
+    // Compute the position of each group on the pie:
+    var pie = d3.pie()
+      .value(function(d) {return d.value; })
+    var data_ready = pie(d3.entries(dict))
+    var arcGenerator = d3.arc()
+    .innerRadius(0)
+    .outerRadius(radius)
+
+    // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
+    svg
+      .selectAll('whatever')
+      .data(data_ready)
+      .enter()
+      .append('path')
+      .attr('d', d3.arc()
+        .innerRadius(0)
+        .outerRadius(radius)
+      )
+      .attr('fill', function(d){ return(color(d.data.key)) })
+      .attr("stroke", "black")
+      .style("stroke-width", "2px")
+      .style("opacity", 0.7)
+    // add annotation
+    svg
+    .selectAll('mySlices')
+    .data(data_ready)
+    .enter()
+    .append('text')
+    .text(function(d){ return  d.data.key + ' ' + (dict[d.data.key]/filtered_data.length*100).toFixed(2)+'%'})
+    .attr("transform", function(d) { return "translate(" + arcGenerator.centroid(d) + ")";  })
+    .style("text-anchor", "middle")
+    .style("font-size", 12)
+  })
+}
+function get_selected(name){
+  var elements = document.getElementsByName(name)
+  for (i=0;i<elements.length;i++){
+    if (elements[i].checked){
+      console.log(elements[i].value)
+      return elements[i].value
+    }
+  }
+  return null
+}
+
+update_scene3('All')
+
+
+
+</script>
