@@ -81,7 +81,7 @@ function update_scene3(maker){
       .attr("height", height)
     .append("g")
       .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-  d3.csv("https://flunky.github.io/cars2017.csv", function(data) {
+  d3.csv("cars2017.csv", function(data) {
     var filtered_data={}
     if (maker=='All'){
       filtered_data=data
